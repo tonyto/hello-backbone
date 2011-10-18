@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<link rel='stylesheet' href='style.css'>
+		<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'></script>
+		<script type='text/javascript' src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.4/underscore-min.js"></script>
+		<script type='text/javascript' src="backbone.js"></script>
+		<script type='text/javascript' src="backbone-localstorage.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                window.Idea = Backbone.Model.extend({
+                    defaults: function() {
+                        return {
+                            createdOn: new Date()
+                        };
+                    },
+                    
+                    initialize: function() {
+                        console.log('hey Im new: ' + this.get('title'));
+                    }
+                });
+                
+                window.IdeaList = Backbone.Collection.extend({
+                    model: Idea,
+                    localStorage: new Store("ideas"),
+                });
+                
+                window.Ideas = new IdeaList();
+                
+                window.ItemView = Backbone.View.extend({
+                    el: $('.idea-list'),
+                    
+                    template: _.template($('#item_template').html()),
+                    
+                    initialize: function(item) {
+//                        Maps.create(item);
+                        this.model = item
+                        this.render();
+                    },
+                    
+                    render: function() {
+                        console.log(this.model.toJSON());
+                        $(this.el).html(this.template(this.model.toJSON()));
+                        return this;
+                    },
+                });
+                
+                window.AppView = Backbone.View.extend({
+                    el: $('#content'),
+                    
+                    template: _.template($('#scene_template').html()),
+                    
+                    initialize: function () {
+                        _.bind(this, "createOnEnter");
+                    },
+                    
+                    events: {
+                        "keypress #new-idea": "createOnEnter"
+                    },
+                    
+                    showToolTip: function(e) {
+                        this.$(".ui-tooltip").removeClass('hide');
+                    },
+                    
+                    createOnEnter: function (e) {
+                        var text = e.currentTarget.value;
+                        if (!text || e.keyCode != 13) return;
+                        
+                        var idea = new Idea({title: text});                        
+                        new ItemView(idea);
+                    }
+                });
+                
+                window.App = new AppView;
+            })
+        </script>
+	<head>
+	<body>
+	    <h1>Idea Mapper</h1>
+	    <div id='content'>
+	        <div>
+	            <input type="text" id="new-idea" name="new-idea" placeholder="Give your idea a name"/>
+	            <span class="ui-tooltip hide"> Press enter to create this idea </span>
+	        </div>
+	        <div>
+	            <ul class='idea-list'>
+	            
+	            </ul>
+	        </div>
+	        
+	    </div>
+	    
+	    <script type='text/template' id='scene_template'>
+	        <h4>hello<h4>
+	    </script>
+	    
+	    <script type='text/template' id='item_template'>
+	        <li class="item">
+	            <%= title %>
+	        </li>
+	    </script>
+	</body>
+</html>

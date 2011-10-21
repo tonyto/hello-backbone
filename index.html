@@ -35,12 +35,14 @@
                     initialize: function(item) {
 //                        Maps.create(item);
                         this.model = item
+						
+						$('#new-idea').val('');
                         this.render();
                     },
                     
                     render: function() {
                         console.log(this.model.toJSON());
-                        $(this.el).html(this.template(this.model.toJSON()));
+                        $(this.el).append(this.template(this.model.toJSON()));
                         return this;
                     },
                 });
@@ -63,11 +65,11 @@
                     },
                     
                     createOnEnter: function (e) {
-                        var text = e.currentTarget.value;
+                        var text = $('#new-idea').val();
                         if (!text || e.keyCode != 13) return;
                         
                         var idea = new Idea({title: text});                        
-                        new ItemView(idea);
+                        new ItemView(idea);						
                     }
                 });
                 
